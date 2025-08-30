@@ -19,6 +19,8 @@ import validationRoutes from '@/routes/validations';
 import gamificationRoutes from '@/routes/gamification';
 import smsRoutes from '@/routes/sms';
 import uploadRoutes from '@/routes/upload';
+import aiValidationRoutes from '@/routes/aiValidation';
+import adminRoutes from '@/routes/admin';
 
 // Load environment variables
 dotenv.config();
@@ -74,6 +76,8 @@ app.use('/api/validations', validationRoutes);
 app.use('/api/gamification', gamificationRoutes);
 app.use('/api/sms', smsRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/ai-validation', aiValidationRoutes);
+app.use('/api/admin', adminRoutes);
 
 // API documentation endpoint
 app.get('/api', (req, res) => {
@@ -88,7 +92,9 @@ app.get('/api', (req, res) => {
       validations: '/api/validations',
       gamification: '/api/gamification',
       sms: '/api/sms',
-      upload: '/api/upload'
+      upload: '/api/upload',
+      aiValidation: '/api/ai-validation',
+      admin: '/api/admin'
     },
     documentation: '/api/docs'
   });

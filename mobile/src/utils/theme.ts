@@ -95,7 +95,7 @@ const darkTheme = {
 };
 
 export const theme = lightTheme;
-export const darkTheme = darkTheme;
+//export const darkTheme = darkTheme;
 
 // Custom theme extensions
 export const customColors = {

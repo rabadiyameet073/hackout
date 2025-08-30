@@ -266,4 +266,97 @@ router.get('/me', authenticate, asyncHandler(async (req: AuthenticatedRequest, r
   });
 }));
 
+/**
+ * POST /api/auth/admin-login
+ * Admin login with role verification
+ */
+router.post('/admin-login', [
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, password } = req.body;
+
+    // Authenticate with Supabase
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials'
+      });
+    }
+
+    // Get user profile with role check
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (userError || !user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Check if user has admin privileges
+    const adminRoles = ['admin', 'moderator', 'analyst'];
+    if (!adminRoles.includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Insufficient privileges for admin access'
+      });
+    }
+
+    // Update last login
+    await supabase
+      .from('users')
+      .update({ last_login: new Date().toISOString() })
+      .eq('id', user.id);
+
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        full_name: user.full_name,
+        role: user.role,
+        avatar_url: user.avatar_url,
+        permissions: user.permissions || [],
+        last_login: user.last_login,
+        created_at: user.created_at
+      }
+    });
+
+  } catch (error) {
+    logger.error('Admin login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Login failed'
+    });
+  }
+});
+
 export default router;

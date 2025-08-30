@@ -25,17 +25,18 @@ export default function App() {
     async function prepare() {
       try {
         // Pre-load fonts, make any API calls you need to do here
-        await Font.loadAsync({
-          'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
-          'Roboto-Bold': require('./assets/fonts/Roboto-Bold.ttf'),
-          'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
-        });
+        // Note: Using system fonts for now, custom fonts can be added later
+        // await Font.loadAsync({
+        //   'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
+        //   'Roboto-Bold': require('./assets/fonts/Roboto-Bold.ttf'),
+        //   'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
+        // });
 
-        // Initialize app services
-        await initializeApp();
+        // Initialize app services (simplified for initial testing)
+        // await initializeApp();
 
-        // Artificially delay for demo purposes
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Artificially delay for demo purposes (reduced for testing)
+        await new Promise(resolve => setTimeout(resolve, 500));
       } catch (e) {
         console.warn(e);
       } finally {
